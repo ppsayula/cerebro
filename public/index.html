@@ -195,6 +195,32 @@
     .send-btn:disabled { background: var(--border); cursor: not-allowed; }
     .send-btn svg { width: 22px; height: 22px; }
 
+    /* Botón de voz */
+    .voice-btn {
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .voice-btn:hover { background: var(--bg); color: var(--primary); }
+    .voice-btn.recording {
+      background: #ff4444;
+      color: white;
+      animation: pulse 1s infinite;
+    }
+    .voice-btn svg { width: 24px; height: 24px; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
     /* Welcome screen personalizado por agente */
     .welcome {
       flex: 1;
@@ -307,8 +333,16 @@
   </div>
 
   <div class="input-area">
+    <button class="voice-btn" id="voice-btn" title="Hablar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
     <div class="input-wrapper">
-      <textarea id="message-input" placeholder="Escribe tu consulta..." rows="1"></textarea>
+      <textarea id="message-input" placeholder="Escribe o habla tu consulta..." rows="1"></textarea>
     </div>
     <button class="send-btn" id="send-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -590,6 +624,72 @@
         'exportar_acta': 'Exportando documento'
       };
       return names[toolName] || toolName;
+    }
+
+    // ===== RECONOCIMIENTO DE VOZ =====
+    const voiceBtn = document.getElementById('voice-btn');
+    let recognition = null;
+    let isRecording = false;
+
+    // Inicializar Speech Recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'es-MX';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        isRecording = true;
+        voiceBtn.classList.add('recording');
+        messageInput.placeholder = 'Escuchando...';
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        messageInput.placeholder = 'Escribe o habla tu consulta...';
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        messageInput.value = transcript;
+        messageInput.style.height = 'auto';
+        messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
+
+        // Si es resultado final, enviar automáticamente
+        if (event.results[event.results.length - 1].isFinal) {
+          setTimeout(() => {
+            if (messageInput.value.trim()) {
+              sendMessage();
+            }
+          }, 500);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech error:', event.error);
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        messageInput.placeholder = 'Escribe o habla tu consulta...';
+        if (event.error === 'not-allowed') {
+          alert('Permite el acceso al micrófono para usar la función de voz');
+        }
+      };
+
+      voiceBtn.addEventListener('click', () => {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          recognition.start();
+        }
+      });
+    } else {
+      // Navegador no soporta voz
+      voiceBtn.style.display = 'none';
     }
 
     // Service Worker
