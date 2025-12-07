@@ -8,6 +8,60 @@ import Anthropic from '@anthropic-ai/sdk';
 const ACTAS_API = process.env.ACTAS_LABORALES_URL || 'http://localhost:3000';
 const EMPRESA_ID = process.env.EMPRESA_ID || '1';
 
+// Interfaces para las respuestas de la API
+interface Falta {
+  nombre: string;
+  categoria: string;
+  articulo_lft: string;
+  gravedad: string;
+  sancion_sugerida: string;
+}
+
+interface Acta {
+  id: number;
+  folio: string;
+  trabajador_nombre: string;
+  tipo_acta: string;
+  estado: string;
+  fecha_hechos: string;
+}
+
+interface Prueba {
+  nombre: string;
+  descripcion: string;
+}
+
+interface AnalisisResponse {
+  faltas_detectadas?: Falta[];
+  sancion_recomendada?: string;
+}
+
+interface GenerarActaResponse {
+  acta?: Acta;
+  tipo_acta?: string;
+  sancion_recomendada?: string;
+  faltas_detectadas?: Falta[];
+}
+
+interface BuscarFaltasResponse {
+  faltas?: Falta[];
+}
+
+interface PruebasResponse {
+  categorias_detectadas?: string[];
+  pruebas_esenciales?: Prueba[];
+  pruebas_recomendadas?: Prueba[];
+}
+
+interface ListarActasResponse {
+  actas?: Acta[];
+}
+
+interface ExportarResponse {
+  url?: string;
+  folio?: string;
+}
+
 // Definición de tools para Claude
 export const legalTools: Anthropic.Tool[] = [
   {
@@ -186,9 +240,8 @@ async function analizarIncidente(descripcion: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data = await res.json();
+  const data: AnalisisResponse = await res.json();
 
-  // Formatear respuesta para el agente
   let resultado = `**Análisis del Incidente**\n\n`;
 
   if (data.faltas_detectadas && data.faltas_detectadas.length > 0) {
@@ -220,7 +273,6 @@ async function generarActa(input: Record<string, unknown>): Promise<string> {
     fecha_hechos: input.fecha_hechos || hoy,
     hora_hechos: input.hora_hechos || '08:00',
     lugar_hechos: input.lugar_hechos || 'Instalaciones de la empresa',
-    // Personal por defecto (se puede configurar)
     jefe_nombre: 'Supervisor de Área',
     jefe_puesto: 'Supervisor',
     rh_nombre: 'Recursos Humanos',
@@ -244,7 +296,7 @@ async function generarActa(input: Record<string, unknown>): Promise<string> {
     throw new Error(`Error generando acta: ${error}`);
   }
 
-  const data = await res.json();
+  const data: GenerarActaResponse = await res.json();
 
   let resultado = `**Acta Generada Exitosamente**\n\n`;
   resultado += `📄 **Folio:** ${data.acta?.folio || 'N/A'}\n`;
@@ -277,7 +329,7 @@ async function buscarFaltas(keyword: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data = await res.json();
+  const data: BuscarFaltasResponse = await res.json();
 
   if (!data.faltas || data.faltas.length === 0) {
     return `No se encontraron faltas con la palabra "${keyword}"`;
@@ -306,15 +358,15 @@ async function obtenerPruebas(descripcion: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data = await res.json();
+  const data: PruebasResponse = await res.json();
 
   let resultado = `**Pruebas Recomendadas**\n\n`;
 
-  if (data.categorias_detectadas?.length > 0) {
+  if (data.categorias_detectadas && data.categorias_detectadas.length > 0) {
     resultado += `Categorías detectadas: ${data.categorias_detectadas.join(', ')}\n\n`;
   }
 
-  if (data.pruebas_esenciales?.length > 0) {
+  if (data.pruebas_esenciales && data.pruebas_esenciales.length > 0) {
     resultado += `**Pruebas ESENCIALES (obligatorias):**\n`;
     for (const p of data.pruebas_esenciales) {
       resultado += `- ${p.nombre}: ${p.descripcion}\n`;
@@ -322,7 +374,7 @@ async function obtenerPruebas(descripcion: string): Promise<string> {
     resultado += '\n';
   }
 
-  if (data.pruebas_recomendadas?.length > 0) {
+  if (data.pruebas_recomendadas && data.pruebas_recomendadas.length > 0) {
     resultado += `**Pruebas recomendadas:**\n`;
     for (const p of data.pruebas_recomendadas) {
       resultado += `- ${p.nombre}\n`;
@@ -351,7 +403,7 @@ async function listarActas(
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data = await res.json();
+  const data: ListarActasResponse = await res.json();
 
   if (!data.actas || data.actas.length === 0) {
     return trabajadorNombre
@@ -384,7 +436,7 @@ async function exportarActa(
     throw new Error(`Error exportando: ${res.status}`);
   }
 
-  const data = await res.json();
+  const data: ExportarResponse = await res.json();
 
   if (data.url) {
     return `**Documento exportado:**\n📥 [Descargar ${formato.toUpperCase()}](${data.url})\n\nFolio: ${data.folio || 'N/A'}`;
