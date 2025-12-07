@@ -1,0 +1,39 @@
+{
+  "name": "cerebro",
+  "version": "1.0.0",
+  "description": "Dream Team Multiagente - Centro de Comando para PyMES Agricolas",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "node -e \"const fs=require('fs');fs.cpSync('public','dist/public',{recursive:true});fs.cpSync('src/agents','dist/agents',{recursive:true})\"",
+    "start": "node dist/server.js",
+    "chat": "tsx src/orchestrator/cerebro.ts",
+    "test:estratega": "tsx src/agents/estratega/agent.ts",
+    "serve": "tsx src/server.ts"
+  },
+  "keywords": [
+    "ai",
+    "multi-agent",
+    "agriculture",
+    "claude",
+    "anthropic"
+  ],
+  "author": "Jose Fernandez",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}
