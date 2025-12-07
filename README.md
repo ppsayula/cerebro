@@ -4,6 +4,8 @@
 
 Centro de comando con IA que integra 4 agentes especializados para asesorar PyMES agricolas en Mexico.
 
+**URL Produccion:** https://cerebro-production-8419.up.railway.app
+
 ---
 
 ## Los 4 Agentes
@@ -17,26 +19,19 @@ Centro de comando con IA que integra 4 agentes especializados para asesorar PyME
 
 ---
 
-## Como Funciona
+## Funcionalidades
 
-```
-Usuario: "Cuanto me costo la frambuesa y hay riesgo de helada?"
-
-CEREBRO (Clasificador):
-├── Detecta: consulta multi-dominio
-├── Agente primario: CFO (costos)
-└── Agente secundario: AGROEXPERT (helada)
-
-CFO: "Frambuesa noviembre: $3.38/kg, 8% sobre objetivo..."
-AGROEXPERT: "Alerta: probabilidad de helada 75% manana 3am..."
-
-CEREBRO (Consolidador):
-└── Respuesta unificada al usuario
-```
+- **Chat con streaming** - Respuestas en tiempo real
+- **PWA instalable** - Funciona como app en celular
+- **Entrada por voz** - Habla tus consultas (Chrome)
+- **Tool Use** - El agente LEGAL puede generar actas conectando con Actas Laborales
+- **Preguntas personalizadas** - Cada agente tiene su menu de consultas frecuentes
 
 ---
 
 ## Inicio Rapido
+
+### Desarrollo Local
 
 ```bash
 # Instalar dependencias
@@ -44,11 +39,26 @@ cd cerebro
 npm install
 
 # Configurar API key de Anthropic
-export ANTHROPIC_API_KEY=sk-ant-...
+# Crear archivo .env con:
+ANTHROPIC_API_KEY=sk-ant-...
 
-# Iniciar chat interactivo
-npm run chat
+# Iniciar servidor de desarrollo
+npm run dev
+# Abre http://localhost:4000
 ```
+
+### Produccion (Railway)
+
+El proyecto esta desplegado en Railway. Para nuevos deploys:
+
+```bash
+git add -A && git commit -m "mensaje" && git push
+```
+
+Railway detecta el push y redeploya automaticamente.
+
+Variables de entorno requeridas en Railway:
+- `ANTHROPIC_API_KEY` - Tu clave de Anthropic
 
 ---
 
@@ -58,22 +68,22 @@ npm run chat
 cerebro/
 ├── src/
 │   ├── agents/
-│   │   ├── agroexpert/
-│   │   │   └── prompt.md       # System prompt del agronomo
-│   │   ├── cfo/
-│   │   │   └── prompt.md       # System prompt del CFO
-│   │   ├── legal/
-│   │   │   └── prompt.md       # System prompt del abogado
-│   │   └── estratega/
-│   │       ├── prompt.md       # System prompt del estratega
-│   │       └── agent.ts        # Implementacion con funciones
+│   │   ├── agroexpert/prompt.md   # System prompt del agronomo
+│   │   ├── cfo/prompt.md          # System prompt del CFO
+│   │   ├── legal/prompt.md        # System prompt del abogado
+│   │   └── estratega/prompt.md    # System prompt del estratega
 │   │
-│   ├── orchestrator/
-│   │   └── cerebro.ts          # Orquestador central
+│   ├── tools/
+│   │   └── legal-tools.ts         # Tool Use para generar actas
 │   │
-│   ├── api/                    # (Futuro) API REST/WebSocket
-│   └── knowledge/              # (Futuro) Base de conocimiento
+│   └── server.ts                  # Servidor Express con streaming
 │
+├── public/
+│   ├── index.html                 # UI del chat
+│   ├── manifest.json              # Config PWA
+│   └── sw.js                      # Service Worker
+│
+├── Dockerfile                     # Para Railway
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -81,20 +91,20 @@ cerebro/
 
 ---
 
-## Uso Programatico
+## Herramientas del Agente LEGAL
 
-```typescript
-import { cerebro } from './orchestrator/cerebro';
+El agente LEGAL tiene acceso a estas herramientas via Tool Use:
 
-// Consulta automatica (CEREBRO decide el agente)
-const response = await cerebro.process("Cuanto le debo a Fertilizantes del Norte?");
-console.log(response.response);
-console.log('Agentes usados:', response.agentsUsed);
+| Herramienta | Funcion |
+|-------------|---------|
+| `analizar_incidente` | Detecta faltas en una descripcion |
+| `generar_acta` | Crea acta administrativa completa |
+| `buscar_faltas` | Busca en catalogo de faltas LFT |
+| `obtener_pruebas_recomendadas` | Sugiere evidencias necesarias |
+| `listar_actas_recientes` | Muestra historial de actas |
+| `exportar_acta` | Genera PDF o Word |
 
-// Consulta directa a un agente especifico
-const legal = await cerebro.askAgent('legal', 'Genera acta para Juan Perez por 3 faltas');
-console.log(legal);
-```
+Requiere que Actas Laborales este corriendo en localhost:3000 (o configurar `ACTAS_LABORALES_URL`).
 
 ---
 
@@ -104,25 +114,21 @@ console.log(legal);
 - "Mis arandanos tienen hojas amarillas"
 - "Hay riesgo de helada esta semana?"
 - "Que hago contra la Drosophila suzukii?"
-- "Cual es el pH optimo para frambuesa?"
 
 ### CFO
 - "Cuanto me costo el kg de arandano este mes?"
-- "Comparame precios de fertilizantes del ultimo ano"
 - "Cual es mi costo de nomina semanal?"
 - "Calcula el ROI de invertir en 10 hectareas mas"
 
 ### LEGAL
-- "Juan Perez falto 4 dias sin justificar"
+- "Hazme un acta para Juan que llego tomado"
 - "Genera contrato de temporada para cosecha"
-- "Cuanto seria el finiquito de Maria Lopez?"
-- "Se vence el contrato de Pedro en 10 dias"
+- "Muestrame las actas recientes"
 
 ### ESTRATEGA
-- "Deberia invertir en mas hectareas de frambuesa?"
-- "Como mejoro la productividad de mi equipo?"
-- "Quiero hacer planeacion estrategica para 2026"
-- "Evalua si debo diversificar a zarzamora"
+- "Que libros de estrategia conoces?"
+- "Explicame el Hedgehog Concept de Jim Collins"
+- "Como aplico la Teoria de Restricciones?"
 
 ---
 
@@ -130,20 +136,24 @@ console.log(legal);
 
 - **LLM:** Claude Sonnet 4 (Anthropic)
 - **Runtime:** Node.js + TypeScript
-- **Orquestacion:** Clasificador + Router propio
+- **Frontend:** HTML/CSS/JS vanilla (PWA)
+- **Servidor:** Express.js con SSE streaming
+- **Deploy:** Railway (Docker)
+- **Tool Use:** Integracion con Actas Laborales API
 
 ---
 
 ## Roadmap
 
-- [x] Crear prompts de los 4 agentes
-- [x] Implementar orquestador basico
-- [ ] Conectar con AGROAI (datos reales)
-- [ ] Conectar con Agro-Compras (facturas)
-- [ ] Conectar con Contratos-SaaS (empleados)
-- [ ] API REST para integracion
-- [ ] Interface web de chat
-- [ ] Memoria persistente (Mem0)
+- [x] Chat con 4 agentes especializados
+- [x] Streaming de respuestas
+- [x] PWA instalable en celular
+- [x] Entrada por voz
+- [x] Tool Use para agente LEGAL
+- [x] Deploy en Railway
+- [ ] Conectar CFO con datos reales
+- [ ] Conectar AGROEXPERT con sensores
+- [ ] Memoria persistente entre sesiones
 
 ---
 
@@ -156,4 +166,4 @@ console.log(legal);
 
 ---
 
-*Creado: 6 Diciembre 2025*
+*Actualizado: 7 Diciembre 2025*
