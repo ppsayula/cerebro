@@ -240,7 +240,7 @@ async function analizarIncidente(descripcion: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data: AnalisisResponse = await res.json();
+  const data = await res.json() as AnalisisResponse;
 
   let resultado = `**Análisis del Incidente**\n\n`;
 
@@ -296,7 +296,7 @@ async function generarActa(input: Record<string, unknown>): Promise<string> {
     throw new Error(`Error generando acta: ${error}`);
   }
 
-  const data: GenerarActaResponse = await res.json();
+  const data = await res.json() as GenerarActaResponse;
 
   let resultado = `**Acta Generada Exitosamente**\n\n`;
   resultado += `📄 **Folio:** ${data.acta?.folio || 'N/A'}\n`;
@@ -329,7 +329,7 @@ async function buscarFaltas(keyword: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data: BuscarFaltasResponse = await res.json();
+  const data = await res.json() as BuscarFaltasResponse;
 
   if (!data.faltas || data.faltas.length === 0) {
     return `No se encontraron faltas con la palabra "${keyword}"`;
@@ -358,7 +358,7 @@ async function obtenerPruebas(descripcion: string): Promise<string> {
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data: PruebasResponse = await res.json();
+  const data = await res.json() as PruebasResponse;
 
   let resultado = `**Pruebas Recomendadas**\n\n`;
 
@@ -403,7 +403,7 @@ async function listarActas(
     throw new Error(`API error: ${res.status}`);
   }
 
-  const data: ListarActasResponse = await res.json();
+  const data = await res.json() as ListarActasResponse;
 
   if (!data.actas || data.actas.length === 0) {
     return trabajadorNombre
@@ -436,7 +436,7 @@ async function exportarActa(
     throw new Error(`Error exportando: ${res.status}`);
   }
 
-  const data: ExportarResponse = await res.json();
+  const data = await res.json() as ExportarResponse;
 
   if (data.url) {
     return `**Documento exportado:**\n📥 [Descargar ${formato.toUpperCase()}](${data.url})\n\nFolio: ${data.folio || 'N/A'}`;
