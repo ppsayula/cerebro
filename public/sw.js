@@ -3,7 +3,7 @@
  * Enables offline functionality and caching for PWA
  */
 
-const CACHE_NAME = 'cerebro-v1';
+const CACHE_NAME = 'cerebro-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

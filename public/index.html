@@ -8,40 +8,25 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CEREBRO">
-
   <title>CEREBRO - Dream Team Multiagente</title>
-
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-
   <style>
     :root {
       --primary: #1a472a;
       --primary-light: #2d5a3d;
-      --secondary: #f4a460;
       --bg: #f5f5f5;
       --card-bg: #ffffff;
       --text: #333333;
       --text-light: #666666;
       --border: #e0e0e0;
-      --success: #4caf50;
-      --warning: #ff9800;
-      --error: #f44336;
       --agent-agroexpert: #4caf50;
       --agent-cfo: #2196f3;
       --agent-legal: #9c27b0;
       --agent-estratega: #ff9800;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       height: 100vh;
@@ -49,238 +34,122 @@
       flex-direction: column;
       overflow: hidden;
     }
-
-    /* Header */
     .header {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
       color: white;
-      padding: 16px 20px;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 100;
     }
+    .header-logo { font-size: 28px; }
+    .header-title h1 { font-size: 18px; font-weight: 600; }
+    .header-title p { font-size: 11px; opacity: 0.85; }
 
-    .header-logo {
-      font-size: 32px;
-    }
-
-    .header-title {
-      flex: 1;
-    }
-
-    .header-title h1 {
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .header-title p {
-      font-size: 12px;
-      opacity: 0.85;
-    }
-
-    .header-status {
-      width: 10px;
-      height: 10px;
-      background: var(--success);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--success);
-    }
-
-    /* Agents Bar */
+    /* Barra de agentes - más grande */
     .agents-bar {
       background: var(--card-bg);
-      padding: 12px 16px;
+      padding: 16px;
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
+      gap: 12px;
+      justify-content: center;
       border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
-
     .agent-chip {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
+      padding: 16px 24px;
+      border-radius: 16px;
       font-weight: 500;
-      white-space: nowrap;
       cursor: pointer;
-      transition: all 0.2s;
-      border: 2px solid transparent;
+      transition: all 0.3s;
+      border: 3px solid transparent;
+      min-width: 100px;
     }
-
-    .agent-chip.auto {
-      background: var(--primary);
-      color: white;
-    }
-
-    .agent-chip.agroexpert {
-      background: rgba(76, 175, 80, 0.15);
-      color: var(--agent-agroexpert);
-    }
-
-    .agent-chip.cfo {
-      background: rgba(33, 150, 243, 0.15);
-      color: var(--agent-cfo);
-    }
-
-    .agent-chip.legal {
-      background: rgba(156, 39, 176, 0.15);
-      color: var(--agent-legal);
-    }
-
-    .agent-chip.estratega {
-      background: rgba(255, 152, 0, 0.15);
-      color: var(--agent-estratega);
-    }
-
+    .agent-chip .agent-icon { font-size: 32px; }
+    .agent-chip .agent-name { font-size: 14px; font-weight: 600; }
+    .agent-chip .agent-desc { font-size: 10px; opacity: 0.7; }
+    .agent-chip.agroexpert { background: rgba(76, 175, 80, 0.12); color: var(--agent-agroexpert); }
+    .agent-chip.cfo { background: rgba(33, 150, 243, 0.12); color: var(--agent-cfo); }
+    .agent-chip.legal { background: rgba(156, 39, 176, 0.12); color: var(--agent-legal); }
+    .agent-chip.estratega { background: rgba(255, 152, 0, 0.12); color: var(--agent-estratega); }
+    .agent-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .agent-chip.active {
       border-color: currentColor;
       transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
+    .agent-chip.active .agent-icon { transform: scale(1.1); }
 
-    .agent-chip:hover {
-      transform: scale(1.05);
-    }
-
-    /* Chat Container */
     .chat-container {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
-
-    /* Messages */
     .message {
       max-width: 85%;
       padding: 12px 16px;
       border-radius: 16px;
-      animation: fadeIn 0.3s ease;
+      animation: fadeIn 0.2s ease;
     }
-
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .message.user {
       align-self: flex-end;
       background: var(--primary);
       color: white;
       border-bottom-right-radius: 4px;
     }
-
     .message.assistant {
       align-self: flex-start;
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
     }
-
     .message-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 8px;
-      font-size: 12px;
-      font-weight: 600;
     }
-
-    .message-header .agent-badge {
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 10px;
+    .agent-badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
     }
-
-    .message-header .agent-badge.agroexpert { background: var(--agent-agroexpert); color: white; }
-    .message-header .agent-badge.cfo { background: var(--agent-cfo); color: white; }
-    .message-header .agent-badge.legal { background: var(--agent-legal); color: white; }
-    .message-header .agent-badge.estratega { background: var(--agent-estratega); color: white; }
-
+    .agent-badge.agroexpert { background: var(--agent-agroexpert); color: white; }
+    .agent-badge.cfo { background: var(--agent-cfo); color: white; }
+    .agent-badge.legal { background: var(--agent-legal); color: white; }
+    .agent-badge.estratega { background: var(--agent-estratega); color: white; }
     .message-content {
-      line-height: 1.5;
+      line-height: 1.6;
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
-
-    .message-content h1, .message-content h2, .message-content h3 {
-      margin: 16px 0 8px 0;
-      font-size: 1.1em;
-    }
-
-    .message-content ul, .message-content ol {
-      padding-left: 20px;
-      margin: 8px 0;
-    }
-
-    .message-content li {
-      margin: 4px 0;
-    }
-
-    .message-content strong {
-      font-weight: 600;
-    }
-
-    .message-content code {
-      background: rgba(0,0,0,0.08);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.9em;
-    }
-
-    .message-time {
-      font-size: 10px;
-      opacity: 0.6;
-      margin-top: 6px;
-      text-align: right;
-    }
-
-    /* Typing Indicator */
-    .typing-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      max-width: 120px;
-    }
-
-    .typing-indicator span {
-      font-size: 12px;
-      color: var(--text-light);
-    }
-
-    .typing-dots {
-      display: flex;
-      gap: 4px;
-    }
-
-    .typing-dots div {
+    .message-content strong { font-weight: 600; }
+    .typing-cursor {
+      display: inline-block;
       width: 8px;
-      height: 8px;
+      height: 16px;
       background: var(--primary);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
+      animation: blink 0.8s infinite;
+      vertical-align: text-bottom;
+      margin-left: 2px;
     }
-
-    .typing-dots div:nth-child(1) { animation-delay: -0.32s; }
-    .typing-dots div:nth-child(2) { animation-delay: -0.16s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
     }
-
-    /* Input Area */
     .input-area {
       background: var(--card-bg);
       padding: 12px 16px;
@@ -289,7 +158,6 @@
       gap: 12px;
       align-items: flex-end;
     }
-
     .input-wrapper {
       flex: 1;
       display: flex;
@@ -297,13 +165,8 @@
       border-radius: 24px;
       border: 1px solid var(--border);
       overflow: hidden;
-      transition: border-color 0.2s;
     }
-
-    .input-wrapper:focus-within {
-      border-color: var(--primary);
-    }
-
+    .input-wrapper:focus-within { border-color: var(--primary); }
     #message-input {
       flex: 1;
       border: none;
@@ -311,50 +174,28 @@
       font-size: 16px;
       background: transparent;
       resize: none;
-      max-height: 120px;
+      max-height: 100px;
       font-family: inherit;
     }
-
-    #message-input:focus {
-      outline: none;
-    }
-
-    #message-input::placeholder {
-      color: var(--text-light);
-    }
-
+    #message-input:focus { outline: none; }
     .send-btn {
       background: var(--primary);
       color: white;
       border: none;
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
-      flex-shrink: 0;
     }
+    .send-btn:hover { background: var(--primary-light); }
+    .send-btn:disabled { background: var(--border); cursor: not-allowed; }
+    .send-btn svg { width: 22px; height: 22px; }
 
-    .send-btn:hover {
-      background: var(--primary-light);
-      transform: scale(1.05);
-    }
-
-    .send-btn:disabled {
-      background: var(--border);
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .send-btn svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    /* Welcome Screen */
+    /* Welcome screen personalizado por agente */
     .welcome {
       flex: 1;
       display: flex;
@@ -362,107 +203,53 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 32px;
+      padding: 24px;
     }
-
-    .welcome-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-
-    .welcome h2 {
-      font-size: 24px;
-      margin-bottom: 8px;
-      color: var(--primary);
-    }
-
-    .welcome p {
-      color: var(--text-light);
+    .welcome-icon { font-size: 64px; margin-bottom: 16px; transition: all 0.3s; }
+    .welcome h2 { font-size: 24px; margin-bottom: 8px; transition: all 0.3s; }
+    .welcome .agent-subtitle {
+      font-size: 14px;
       margin-bottom: 24px;
+      max-width: 400px;
+      line-height: 1.5;
     }
-
     .example-questions {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
     }
-
     .example-btn {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 12px 16px;
-      border-radius: 12px;
+      border: 2px solid var(--border);
+      padding: 14px 18px;
+      border-radius: 14px;
       font-size: 14px;
       text-align: left;
       cursor: pointer;
       transition: all 0.2s;
-    }
-
-    .example-btn:hover {
-      border-color: var(--primary);
-      transform: translateX(4px);
-    }
-
-    /* Install Prompt */
-    .install-prompt {
-      display: none;
-      position: fixed;
-      bottom: 80px;
-      left: 16px;
-      right: 16px;
-      background: var(--primary);
-      color: white;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-
-    .install-prompt.show {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
-    .install-prompt p {
-      flex: 1;
-      font-size: 14px;
+    .example-btn:hover {
+      border-color: var(--primary);
+      background: rgba(26,71,42,0.05);
+      transform: translateX(4px);
     }
+    .example-btn .btn-icon { font-size: 20px; }
 
-    .install-prompt button {
-      background: white;
-      color: var(--primary);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    /* Colores dinámicos según agente */
+    .welcome.estratega h2 { color: var(--agent-estratega); }
+    .welcome.estratega .example-btn:hover { border-color: var(--agent-estratega); }
+    .welcome.agroexpert h2 { color: var(--agent-agroexpert); }
+    .welcome.agroexpert .example-btn:hover { border-color: var(--agent-agroexpert); }
+    .welcome.cfo h2 { color: var(--agent-cfo); }
+    .welcome.cfo .example-btn:hover { border-color: var(--agent-cfo); }
+    .welcome.legal h2 { color: var(--agent-legal); }
+    .welcome.legal .example-btn:hover { border-color: var(--agent-legal); }
 
-    .install-prompt .close-btn {
-      background: transparent;
-      color: white;
-      padding: 8px;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .header {
-        padding: 12px 16px;
-      }
-
-      .header-title h1 {
-        font-size: 18px;
-      }
-
-      .message {
-        max-width: 90%;
-      }
-    }
-
-    /* Dark mode support */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #1a1a1a;
@@ -471,75 +258,57 @@
         --text-light: #aaaaaa;
         --border: #404040;
       }
-
-      .message-content code {
-        background: rgba(255,255,255,0.1);
-      }
+    }
+    @media (max-width: 600px) {
+      .agents-bar { padding: 12px 8px; gap: 8px; }
+      .agent-chip { padding: 12px 16px; min-width: 80px; }
+      .agent-chip .agent-icon { font-size: 24px; }
+      .agent-chip .agent-name { font-size: 12px; }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="header-logo">🧠</div>
     <div class="header-title">
       <h1>CEREBRO</h1>
       <p>Dream Team Multiagente</p>
     </div>
-    <div class="header-status" id="status-indicator"></div>
   </header>
 
-  <!-- Agent Selection -->
   <div class="agents-bar">
-    <div class="agent-chip auto active" data-agent="auto">
-      🤖 Auto
-    </div>
     <div class="agent-chip agroexpert" data-agent="agroexpert">
-      🌱 Agrónomo
+      <span class="agent-icon">🌱</span>
+      <span class="agent-name">Agrónomo</span>
     </div>
     <div class="agent-chip cfo" data-agent="cfo">
-      💰 CFO
+      <span class="agent-icon">💰</span>
+      <span class="agent-name">CFO</span>
     </div>
     <div class="agent-chip legal" data-agent="legal">
-      ⚖️ Legal
+      <span class="agent-icon">⚖️</span>
+      <span class="agent-name">Legal</span>
     </div>
-    <div class="agent-chip estratega" data-agent="estratega">
-      📊 Estratega
+    <div class="agent-chip estratega active" data-agent="estratega">
+      <span class="agent-icon">📊</span>
+      <span class="agent-name">Estratega</span>
     </div>
   </div>
 
-  <!-- Chat Container -->
   <div class="chat-container" id="chat-container">
-    <!-- Welcome Screen -->
-    <div class="welcome" id="welcome-screen">
-      <div class="welcome-icon">🧠</div>
-      <h2>Bienvenido a CEREBRO</h2>
-      <p>Tu equipo de expertos con IA para agronegocios</p>
-      <div class="example-questions">
-        <button class="example-btn" data-question="¿Hay riesgo de helada esta semana?">
-          🌱 ¿Hay riesgo de helada esta semana?
-        </button>
-        <button class="example-btn" data-question="¿Cuánto me cuesta producir un kg de arándano?">
-          💰 ¿Cuánto me cuesta producir un kg de arándano?
-        </button>
-        <button class="example-btn" data-question="Juan Pérez faltó 3 días sin justificar">
-          ⚖️ Juan Pérez faltó 3 días sin justificar
-        </button>
-        <button class="example-btn" data-question="¿Debería invertir en 10 hectáreas más de frambuesa?">
-          📊 ¿Debería invertir en 10 hectáreas más?
-        </button>
+    <div class="welcome estratega" id="welcome-screen">
+      <div class="welcome-icon" id="welcome-icon">📊</div>
+      <h2 id="welcome-title">Estratega</h2>
+      <p class="agent-subtitle" id="welcome-subtitle">Consultor empresarial con conocimiento de 20+ libros de management y metodologías aplicadas a agronegocios mexicanos.</p>
+      <div class="example-questions" id="example-questions">
+        <!-- Se llena dinámicamente -->
       </div>
     </div>
   </div>
 
-  <!-- Input Area -->
   <div class="input-area">
     <div class="input-wrapper">
-      <textarea
-        id="message-input"
-        placeholder="Escribe tu consulta..."
-        rows="1"
-      ></textarea>
+      <textarea id="message-input" placeholder="Escribe tu consulta..." rows="1"></textarea>
     </div>
     <button class="send-btn" id="send-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -548,54 +317,124 @@
     </button>
   </div>
 
-  <!-- Install Prompt -->
-  <div class="install-prompt" id="install-prompt">
-    <p>📲 Instala CEREBRO en tu dispositivo</p>
-    <button id="install-btn">Instalar</button>
-    <button class="close-btn" id="close-install">✕</button>
-  </div>
-
   <script>
-    // State
-    let selectedAgent = 'auto';
-    let isLoading = false;
-    let deferredPrompt = null;
+    // Configuración de cada agente
+    const AGENT_CONFIG = {
+      estratega: {
+        icon: '📊',
+        title: 'Estratega',
+        subtitle: 'Consultor empresarial con conocimiento de 20+ libros de management y metodologías aplicadas a agronegocios mexicanos.',
+        questions: [
+          { icon: '📚', text: '¿Qué libros de estrategia conoces?', question: '¿Qué libros de estrategia conoces y cómo los aplicas a agronegocios?' },
+          { icon: '🧩', text: '¿Qué metodologías manejas?', question: '¿Qué metodologías y frameworks de gestión manejas? Dame un catálogo completo.' },
+          { icon: '🦔', text: 'Hedgehog Concept (Jim Collins)', question: 'Explícame el Hedgehog Concept de Jim Collins aplicado a mi empresa de berries' },
+          { icon: '⚙️', text: 'Teoría de Restricciones (TOC)', question: '¿Cómo aplico la Teoría de Restricciones de Goldratt en mi operación agrícola?' },
+          { icon: '📈', text: 'OKRs para agronegocio', question: '¿Cómo implemento OKRs en mi empresa agrícola? Dame ejemplos concretos.' }
+        ]
+      },
+      agroexpert: {
+        icon: '🌱',
+        title: 'Agrónomo',
+        subtitle: 'Ingeniero agrónomo experto en berries mexicanos con 40 años de experiencia en producción, plagas, riego y clima.',
+        questions: [
+          { icon: '🫐', text: 'Rendimiento de arándano', question: '¿Cuál es el rendimiento esperado por hectárea de arándano en Jalisco?' },
+          { icon: '🌡️', text: 'Riesgo de heladas', question: '¿Cómo protejo mis cultivos de las heladas? ¿Qué medidas preventivas recomiendas?' },
+          { icon: '💧', text: 'Sistema de riego', question: '¿Qué sistema de riego me recomiendas para frambuesa y por qué?' },
+          { icon: '🐛', text: 'Control de plagas', question: '¿Cuáles son las principales plagas en berries y cómo las controlo?' },
+          { icon: '🧪', text: 'Fertilización', question: '¿Cuál es el programa de fertilización recomendado para zarzamora?' }
+        ]
+      },
+      cfo: {
+        icon: '💰',
+        title: 'CFO',
+        subtitle: 'Director financiero especializado en agronegocios. Análisis de costos, rentabilidad, flujo de caja y decisiones de inversión.',
+        questions: [
+          { icon: '📊', text: 'Costo por kilo de berries', question: '¿Cuánto me cuesta producir un kilo de arándano? Desglose completo.' },
+          { icon: '💵', text: 'Punto de equilibrio', question: '¿Cuál es mi punto de equilibrio en hectáreas y producción?' },
+          { icon: '📈', text: 'ROI de inversión', question: '¿Cuál sería el ROI si invierto en 10 hectáreas más de frambuesa?' },
+          { icon: '💰', text: 'Flujo de caja', question: '¿Cómo manejo el flujo de caja en temporada baja?' },
+          { icon: '🏦', text: 'Financiamiento FIRA', question: '¿Qué opciones de financiamiento FIRA tengo disponibles?' }
+        ]
+      },
+      legal: {
+        icon: '⚖️',
+        title: 'Legal Laboral',
+        subtitle: 'Abogado especializado en derecho laboral mexicano y sector agrícola. Contratos, actas, finiquitos y cumplimiento LFT.',
+        questions: [
+          { icon: '📋', text: 'Generar acta administrativa', question: 'Necesito hacer un acta administrativa para un trabajador que llegó en estado de ebriedad' },
+          { icon: '📝', text: 'Contrato por temporada', question: '¿Cómo hago un contrato por temporada según el Art. 39-F?' },
+          { icon: '⚠️', text: 'Faltas injustificadas', question: 'Un empleado tiene 4 faltas injustificadas este mes, ¿qué procede legalmente?' },
+          { icon: '💼', text: 'Calcular finiquito', question: '¿Cómo calculo el finiquito de un trabajador con 3 años de antigüedad?' },
+          { icon: '🔍', text: 'Historial de actas', question: 'Muéstrame las actas recientes de la empresa' }
+        ]
+      }
+    };
 
-    // Elements
+    let selectedAgent = 'estratega';
+    let isLoading = false;
+    let currentMessageEl = null;
+
     const chatContainer = document.getElementById('chat-container');
     const welcomeScreen = document.getElementById('welcome-screen');
+    const welcomeIcon = document.getElementById('welcome-icon');
+    const welcomeTitle = document.getElementById('welcome-title');
+    const welcomeSubtitle = document.getElementById('welcome-subtitle');
+    const exampleQuestions = document.getElementById('example-questions');
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const agentChips = document.querySelectorAll('.agent-chip');
-    const exampleBtns = document.querySelectorAll('.example-btn');
-    const installPrompt = document.getElementById('install-prompt');
-    const installBtn = document.getElementById('install-btn');
-    const closeInstall = document.getElementById('close-install');
 
-    // Agent selection
+    // Inicializar pantalla de bienvenida
+    updateWelcomeScreen('estratega');
+
+    // Selección de agente
     agentChips.forEach(chip => {
       chip.addEventListener('click', () => {
         agentChips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         selectedAgent = chip.dataset.agent;
+        updateWelcomeScreen(selectedAgent);
       });
     });
 
-    // Example questions
-    exampleBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        messageInput.value = btn.dataset.question;
-        sendMessage();
+    function updateWelcomeScreen(agent) {
+      const config = AGENT_CONFIG[agent];
+
+      // Actualizar clase para colores
+      welcomeScreen.className = `welcome ${agent}`;
+
+      // Actualizar contenido
+      welcomeIcon.textContent = config.icon;
+      welcomeTitle.textContent = config.title;
+      welcomeSubtitle.textContent = config.subtitle;
+
+      // Generar botones de preguntas
+      exampleQuestions.innerHTML = config.questions.map(q => `
+        <button class="example-btn" data-question="${q.question}">
+          <span class="btn-icon">${q.icon}</span>
+          <span>${q.text}</span>
+        </button>
+      `).join('');
+
+      // Agregar event listeners a los nuevos botones
+      document.querySelectorAll('.example-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          messageInput.value = btn.dataset.question;
+          sendMessage();
+        });
       });
-    });
+
+      // Mostrar welcome screen si estaba oculto
+      welcomeScreen.style.display = 'flex';
+    }
 
     // Auto-resize textarea
     messageInput.addEventListener('input', () => {
       messageInput.style.height = 'auto';
-      messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+      messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
     });
 
-    // Send on Enter (but Shift+Enter for new line)
+    // Enter para enviar
     messageInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -603,140 +442,159 @@
       }
     });
 
-    // Send button
     sendBtn.addEventListener('click', sendMessage);
 
-    // Send message function
+    // Enviar mensaje con streaming
     async function sendMessage() {
       const message = messageInput.value.trim();
       if (!message || isLoading) return;
 
-      // Hide welcome screen
       welcomeScreen.style.display = 'none';
-
-      // Add user message
       addMessage(message, 'user');
-
-      // Clear input
       messageInput.value = '';
       messageInput.style.height = 'auto';
 
-      // Show typing indicator
       isLoading = true;
       sendBtn.disabled = true;
-      const typingEl = addTypingIndicator();
+
+      // Crear mensaje del asistente vacío
+      currentMessageEl = createAssistantMessage(selectedAgent);
 
       try {
-        // Determine endpoint
-        const endpoint = selectedAgent === 'auto'
-          ? '/api/chat'
-          : `/api/agent/${selectedAgent}`;
-
-        const response = await fetch(endpoint, {
+        const response = await fetch('/api/chat/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
+          body: JSON.stringify({ message, agent: selectedAgent })
         });
 
-        const data = await response.json();
-
-        // Remove typing indicator
-        typingEl.remove();
-
-        if (response.ok) {
-          const agents = data.agentsUsed || [selectedAgent];
-          addMessage(data.response, 'assistant', agents);
-        } else {
-          addMessage(`Error: ${data.error || 'Error desconocido'}`, 'assistant', ['error']);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '';
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr) {
+                  const data = JSON.parse(jsonStr);
+                  if (data.type === 'text') {
+                    fullText += data.content;
+                    updateAssistantMessage(currentMessageEl, fullText, true);
+                  } else if (data.type === 'end') {
+                    updateAssistantMessage(currentMessageEl, fullText, false);
+                  } else if (data.type === 'error') {
+                    updateAssistantMessage(currentMessageEl, 'Error: ' + data.message, false);
+                  } else if (data.type === 'tool_start' || data.type === 'tool_executing') {
+                    const toolName = formatToolName(data.tool);
+                    const indicator = data.type === 'tool_start'
+                      ? `🔧 Preparando: ${toolName}...`
+                      : `⚙️ Ejecutando: ${toolName}...`;
+                    updateAssistantMessage(currentMessageEl, fullText + '\n\n_' + indicator + '_', true);
+                  }
+                }
+              } catch (e) {
+                console.error('Parse error:', e, line);
+              }
+            }
+          }
+        }
+
+        // Procesar buffer restante
+        if (buffer.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(buffer.slice(6).trim());
+            if (data.type === 'text') {
+              fullText += data.content;
+            }
+            updateAssistantMessage(currentMessageEl, fullText, false);
+          } catch (e) {}
+        }
+
       } catch (error) {
-        typingEl.remove();
-        addMessage(`Error de conexión: ${error.message}`, 'assistant', ['error']);
+        console.error('Fetch error:', error);
+        updateAssistantMessage(currentMessageEl, 'Error de conexión: ' + error.message, false);
       } finally {
         isLoading = false;
         sendBtn.disabled = false;
+        currentMessageEl = null;
       }
     }
 
-    // Add message to chat
-    function addMessage(content, type, agents = []) {
-      const messageEl = document.createElement('div');
-      messageEl.className = `message ${type}`;
-
-      let html = '';
-
-      if (type === 'assistant' && agents.length > 0) {
-        html += '<div class="message-header">';
-        agents.forEach(agent => {
-          if (agent !== 'error') {
-            html += `<span class="agent-badge ${agent}">${agent}</span>`;
-          }
-        });
-        html += '</div>';
-      }
-
-      // Simple markdown parsing
-      let formattedContent = content
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-        .replace(/^- (.*$)/gm, '<li>$1</li>')
-        .replace(/`(.*?)`/g, '<code>$1</code>');
-
-      html += `<div class="message-content">${formattedContent}</div>`;
-      html += `<div class="message-time">${new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</div>`;
-
-      messageEl.innerHTML = html;
-      chatContainer.appendChild(messageEl);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      return messageEl;
-    }
-
-    // Add typing indicator
-    function addTypingIndicator() {
+    function addMessage(content, type) {
       const el = document.createElement('div');
-      el.className = 'typing-indicator';
+      el.className = `message ${type}`;
+      el.innerHTML = `<div class="message-content">${escapeHtml(content)}</div>`;
+      chatContainer.appendChild(el);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function createAssistantMessage(agent) {
+      const el = document.createElement('div');
+      el.className = 'message assistant';
       el.innerHTML = `
-        <div class="typing-dots">
-          <div></div>
-          <div></div>
-          <div></div>
+        <div class="message-header">
+          <span class="agent-badge ${agent}">${AGENT_CONFIG[agent].title}</span>
         </div>
-        <span>Pensando...</span>
+        <div class="message-content"><span class="typing-cursor"></span></div>
       `;
       chatContainer.appendChild(el);
       chatContainer.scrollTop = chatContainer.scrollHeight;
       return el;
     }
 
-    // PWA Install
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      setTimeout(() => {
-        installPrompt.classList.add('show');
-      }, 3000);
-    });
+    function updateAssistantMessage(el, text, isStreaming) {
+      const content = el.querySelector('.message-content');
+      const formatted = formatMarkdown(text);
+      content.innerHTML = formatted + (isStreaming ? '<span class="typing-cursor"></span>' : '');
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installPrompt.classList.remove('show');
-    });
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
-    closeInstall.addEventListener('click', () => {
-      installPrompt.classList.remove('show');
-    });
+    function formatMarkdown(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/_(.*?)_/g, '<em>$1</em>')
+        .replace(/^### (.*$)/gm, '<strong>$1</strong>')
+        .replace(/^## (.*$)/gm, '<strong style="font-size:1.1em">$1</strong>')
+        .replace(/^# (.*$)/gm, '<strong style="font-size:1.2em">$1</strong>');
+    }
 
-    // Register Service Worker
+    function formatToolName(toolName) {
+      const names = {
+        'analizar_incidente': 'Analizando incidente',
+        'generar_acta': 'Generando acta',
+        'buscar_faltas': 'Buscando en catálogo',
+        'obtener_pruebas_recomendadas': 'Obteniendo pruebas',
+        'listar_actas_recientes': 'Consultando historial',
+        'exportar_acta': 'Exportando documento'
+      };
+      return names[toolName] || toolName;
+    }
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('SW registered'))
-        .catch(err => console.log('SW registration failed'));
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
   </script>
 </body>
